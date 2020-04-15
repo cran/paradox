@@ -13,7 +13,7 @@ generate_design_random(param_set, n)
 Number of points to draw randomly.}
 }
 \value{
-(\code{\link[data.table:data.table]{data.table::data.table()}}).
+\link{Design}.
 }
 \description{
 Generates a design with randomly drawn points.
@@ -28,7 +28,8 @@ ps = ParamSet$new(list(
 generate_design_random(ps, 10)
 }
 \seealso{
-Other generate_design: \code{\link{generate_design_grid}},
-  \code{\link{generate_design_lhs}}
+Other generate_design: 
+\code{\link{generate_design_grid}()},
+\code{\link{generate_design_lhs}()}
 }
 \concept{generate_design}

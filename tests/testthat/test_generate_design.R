@@ -12,7 +12,7 @@ test_that("generate_design_random", {
     info = ps$set_id
     d = generate_design_random(ps, n = 5L)
     dd = d$data
-    expect_data_table(dd, any.missing = FALSE, nrow = 5L, ncol = ps$length, info = info)
+    expect_data_table(dd, any.missing = FALSE, nrows = 5L, ncols = ps$length, info = info)
     expect_true(all(map_lgl(d$transpose(), ps$test)), info = info) # check that all rows are feasible
   }
 })
@@ -43,14 +43,14 @@ test_that("generate_design_grid", {
 test_that("generate_design_grid with different resolutions and egde cases", {
   ps = ParamSet$new(list(ParamFct$new("f", levels = letters[1:2])))
   d = generate_design_grid(ps)
-  expect_data_table(d$data, any.missing = FALSE, nrow = 2, ncol = 1)
+  expect_data_table(d$data, any.missing = FALSE, nrows = 2, ncols = 1)
 
   ps = ParamSet$new(list(
     ParamFct$new("f", levels = letters[1:2]),
     ParamDbl$new("d", lower = 0, upper = 1)
   ))
   d = generate_design_grid(ps, param_resolutions = c(d = 3))
-  expect_data_table(d$data, any.missing = FALSE, nrow = 6, ncol = 2)
+  expect_data_table(d$data, any.missing = FALSE, nrows = 6, ncols = 2)
 
   ps = ParamSet$new(list(
     ParamInt$new("x", lower = 0, upper = 10),
@@ -58,13 +58,13 @@ test_that("generate_design_grid with different resolutions and egde cases", {
   ))
   d = generate_design_grid(ps, resolution = 2, param_resolutions = c(y = 3))
   dd = d$data
-  expect_data_table(dd, any.missing = FALSE, nrow = 6, ncol = 2)
+  expect_data_table(dd, any.missing = FALSE, nrows = 6, ncols = 2)
   expect_equal(length(unique(dd$x)), 2)
   expect_equal(length(unique(dd$y)), 3)
 
   d = generate_design_grid(ps, resolution = 2, param_resolutions = c(x = 4, y = 3))
   dd = d$data
-  expect_data_table(dd, any.missing = FALSE, nrow = 12, ncol = 2)
+  expect_data_table(dd, any.missing = FALSE, nrows = 12, ncols = 2)
   expect_equal(length(unique(dd$x)), 4)
   expect_equal(length(unique(dd$y)), 3)
 
@@ -75,7 +75,7 @@ test_that("generate_design_grid with different resolutions and egde cases", {
   ))
   d = generate_design_grid(ps, resolution = 2, param_resolutions = c(y = 3))
   dd = d$data
-  expect_data_table(dd, any.missing = FALSE, nrow = 12, ncol = 3)
+  expect_data_table(dd, any.missing = FALSE, nrows = 12, ncols = 3)
   expect_equal(length(unique(dd$x)), 2)
   expect_equal(length(unique(dd$y)), 3)
   expect_equal(length(unique(dd$z)), 2)
@@ -92,6 +92,8 @@ test_that("check generate_design_grid against concrete expectation", {
 
 
 test_that("generate_design_lhs", {
+  skip_if_not_installed("lhs")
+
   ps_list = list(
     th_paramset_dbl1(),
     th_paramset_full(),
@@ -109,6 +111,8 @@ test_that("generate_design_lhs", {
 })
 
 test_that("generate_design_lhs does not work with deps", {
+  skip_if_not_installed("lhs")
+
   ps = th_paramset_deps()
   expect_error(generate_design_lhs(ps, n = 5L), "dependencies")
 })
@@ -131,3 +135,24 @@ test_that("generate_design_random and grid works with deps", {
   expect_true(all(ifelse(dd$th_param_fct %in% c("a", "b", NA) & dd$th_param_lgl,
     !is.na(dd$th_param_dbl), is.na(dd$th_param_dbl))))
 })
+
+test_that("generate_design_random with zero rows", {
+  ps = th_paramset_full()
+  d = generate_design_random(ps, n = 0)
+  expect_data_table(d$data, any.missing = FALSE, nrows = 0, ncols = ps$length, info = ps$set_id)
+})
+
+test_that("generate_design_lhs with zero rows", {
+  skip_if_not_installed("lhs")
+
+  ps = th_paramset_full()
+  d = generate_design_lhs(ps, n = 0)
+  expect_data_table(d$data, any.missing = FALSE, nrows = 0, ncols = ps$length, info = ps$set_id)
+})
+
+test_that("generate_design_grid with zero rows", {
+  ps = th_paramset_full()
+  d = generate_design_grid(ps, resolution = 0)
+  expect_data_table(d$data, any.missing = FALSE, nrows = 0, ncols = ps$length, info = ps$set_id)
+})
+

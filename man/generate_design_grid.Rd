@@ -4,8 +4,7 @@
 \alias{generate_design_grid}
 \title{Generate a Grid Design}
 \usage{
-generate_design_grid(param_set, resolution = NULL,
-  param_resolutions = NULL)
+generate_design_grid(param_set, resolution = NULL, param_resolutions = NULL)
 }
 \arguments{
 \item{param_set}{:: \link{ParamSet}.}
@@ -17,7 +16,7 @@ Global resolution for all \link{Param}s.}
 Resolution per \link{Param}, named by parameter ID.}
 }
 \value{
-(\code{\link[data.table:data.table]{data.table::data.table()}}).
+\link{Design}.
 }
 \description{
 Generate a grid with a specified resolution in the parameter space.
@@ -33,7 +32,8 @@ ps = ParamSet$new(list(
 generate_design_grid(ps, 10)
 }
 \seealso{
-Other generate_design: \code{\link{generate_design_lhs}},
-  \code{\link{generate_design_random}}
+Other generate_design: 
+\code{\link{generate_design_lhs}()},
+\code{\link{generate_design_random}()}
 }
 \concept{generate_design}

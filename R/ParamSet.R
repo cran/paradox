@@ -127,14 +127,13 @@
 #' )
 #'
 #' ps$trafo = function(x, param_set) {
-#'   x$d = 2^d
+#'   x$d = 2^x$d
 #'   return(x)
 #' }
 #'
 #' ps$add(ParamInt$new("i", lower = 0L, upper = 16L))
 #'
 #' ps$check(list(d = 2.1, f = "a", i = 3L))
-#'
 #' @export
 ParamSet = R6Class("ParamSet",
   public = list(
@@ -258,10 +257,14 @@ ParamSet = R6Class("ParamSet",
           ok = (p1id %in% ns && p2id %in% ns && cond$test(xs[[p2id]])) ||
             (p1id %nin% ns)
           if (isFALSE(ok)) {
+            message = sprintf("The parameter '%s' can only be set if the following condition is met '%s'.", p1id, cond$as_string(p2id))
             val = xs[[p2id]]
-            val = ifelse(is.null(val), "<not-there>", val)
-            return(sprintf("Condition for '%s' not ok: %s %s %s; instead: %s=%s",
-              p1id, p2id, cond$type, str_collapse(cond$rhs), p2id, val))
+            if (is.null(val)) {
+              message = sprintf("%s Instead the parameter value for '%s' is not set at all. Try setting '%s' to a value that satisfies the condition", message, p2id, p2id)
+            } else {
+              message = sprintf("%s Instead the current parameter value is: %s=%s", message, p2id, val)
+            }
+            return(message)
           }
         }
       }
@@ -277,8 +280,13 @@ ParamSet = R6Class("ParamSet",
       ids = names(self$params)
       assert_choice(id, ids)
       assert_choice(on, ids)
+      assert_r6(cond, "Condition")
       if (id == on) {
         stopf("A param cannot depend on itself!")
+      }
+      feasible_on_values = map_lgl(cond$rhs, self$params[[on]]$test)
+      if (any(!feasible_on_values)) {
+        stopf("Condition has infeasible values for %s: %s", on, str_collapse(cond$rhs[!feasible_on_values]))
       }
       private$.deps = rbind(private$.deps, data.table(id = id, on = on, cond = list(cond)))
       invisible(self)
@@ -308,7 +316,10 @@ ParamSet = R6Class("ParamSet",
   ),
 
   active = list(
-    params = function() {
+    params = function(rhs) {
+      if (!missing(rhs) && !identical(rhs, private$.params)) {
+        stop("$params is read-only.")
+      }
       private$.params
     },
 
@@ -413,10 +424,6 @@ ParamSet = R6Class("ParamSet",
 
     has_deps = function() {
       nrow(private$.deps) > 0L
-    },
-
-    extra_values = function() {
-      private$.values[names(private$.values) %nin% names(private$.params)]
     }
   ),
 
@@ -431,8 +438,19 @@ ParamSet = R6Class("ParamSet",
 
     deep_clone = function(name, value) {
       switch(name,
-        ".params" = map(value, function(x) x$clone(deep = TRUE)),
-        ".deps" = copy(value),
+        .params = map(value, function(x) x$clone(deep = TRUE)),
+        .deps = {
+          value = copy(value)
+          value$cond = lapply(value$cond, function(x) x$clone(deep = TRUE))
+          value
+        },
+        .values = map(value, function(x)
+          # clones R6 objects in values, leave other things as they are
+          if (is.environment(x) && !is.null(x$.__enclos_env__)) {
+            x$clone(deep = TRUE)
+          } else {
+            x
+          }),
         value
       )
     }

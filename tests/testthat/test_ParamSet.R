@@ -87,7 +87,7 @@ test_that("empty paramset", {
   expect_equal(ps$length, 0)
   expect_equal(ps$ids(), character(0L))
   expect_equal(ps$lower, set_names(numeric(0L), character(0L)))
-  expect_data_table(ps$deps, nrow = 0L, ncol = 3L)
+  expect_data_table(ps$deps, nrows = 0L, ncols = 3L)
 })
 
 test_that("ParamSet$check", {
@@ -103,7 +103,7 @@ test_that("ParamSet$check", {
 
   ps = ParamLgl$new("x")$rep(2)
   ps$add_dep("x_rep_1", "x_rep_2", CondEqual$new(TRUE))
-  expect_string(ps$check(list(x_rep_1 = FALSE, x_rep_2 = FALSE)), fixed = "not ok: x_rep_2 equal TRUE")
+  expect_string(ps$check(list(x_rep_1 = FALSE, x_rep_2 = FALSE)), fixed = "x_rep_2 = TRUE")
 })
 
 test_that("we cannot create ParamSet with non-strict R names", {
@@ -214,10 +214,10 @@ test_that("ParamSet$add_param", {
 
 test_that("as.data.table", {
   d = as.data.table(ParamSet$new())
-  expect_data_table(d, nrow = 0)
+  expect_data_table(d, nrows = 0)
   ps = th_paramset_full()
   d = as.data.table(ps)
-  expect_data_table(d, nrow = 4, ncol = 11)
+  expect_data_table(d, nrows = 4, ncols = 11)
   expect_equal(ps$ids(), d$id)
   expect_equal(unname(ps$lower), d$lower)
   expect_equal(unname(ps$levels), d$levels)
@@ -290,4 +290,19 @@ test_that("required tag, empty param set (#219)", {
   ps = ParamSet$new()
   ps$ids()
   expect_identical(ps$ids(tags = "required"), character(0))
+})
+
+test_that("paramset clones properly", {
+  ps = ParamSet$new()
+  ps$add(ParamFct$new("a", levels = letters[1:3]))
+  ps$add(ParamFct$new("b", levels = letters[1:3]))
+  ps$add_dep("a", "b", CondAnyOf$new(letters[1:2]))
+  ps2 = ps$clone(deep = TRUE)
+
+  expect_equal(ps, ps2)
+
+  ps$deps$cond[[1]]$rhs = c("b", "c")
+
+  expect_equal(ps$deps$cond[[1]]$rhs, c("b", "c"))
+  expect_equal(ps2$deps$cond[[1]]$rhs, c("a", "b"))
 })

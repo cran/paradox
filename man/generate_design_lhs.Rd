@@ -12,12 +12,12 @@ generate_design_lhs(param_set, n, lhs_fun = NULL)
 \item{n}{:: \code{integer(1)} \cr
 Number of points to sample.}
 
-\item{lhs_fun}{:: \code{function(n, k)} \cr
+\item{lhs_fun}{:: \verb{function(n, k)} \cr
 Function to use to generate a LHS sample, with n samples and k values per param.
 LHS functions are implemented in package \pkg{lhs}, default is to use \code{\link[lhs:maximinLHS]{lhs::maximinLHS()}}.}
 }
 \value{
-(\code{\link[data.table:data.table]{data.table::data.table()}}).
+\link{Design}.
 }
 \description{
 Generate a space-filling design using Latin hypercube sampling.
@@ -27,10 +27,14 @@ ps = ParamSet$new(list(
   ParamDbl$new("ratio", lower = 0, upper = 1),
   ParamFct$new("letters", levels = letters[1:3])
 ))
-generate_design_lhs(ps, 10)
+
+if (requireNamespace("lhs", quietly = TRUE)) {
+  generate_design_lhs(ps, 10)
+}
 }
 \seealso{
-Other generate_design: \code{\link{generate_design_grid}},
-  \code{\link{generate_design_random}}
+Other generate_design: 
+\code{\link{generate_design_grid}()},
+\code{\link{generate_design_random}()}
 }
 \concept{generate_design}

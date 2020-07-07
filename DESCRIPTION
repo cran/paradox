@@ -1,7 +1,7 @@
 Type: Package
 Package: paradox
 Title: Define and Work with Parameter Spaces for Complex Algorithms
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: 
     c(person(given = "Michel",
              family = "Lang",
@@ -26,7 +26,12 @@ Authors@R:
       person(given = "Martin",
              family = "Binder",
              role = "aut",
-             email = "mlr.developer@mb706.com"))
+             email = "mlr.developer@mb706.com"),
+      person(given = "Marc",
+             family = "Becker",
+             role = "ctb",
+             email = "marcbecker@posteo.de",
+             comment = c(ORCID = "0000-0002-8115-0400")))
 Description: Define parameter spaces, constraints and
     dependencies for arbitrary algorithms, to program on such spaces. Also
     includes statistical designs and random samplers. Objects are
@@ -38,19 +43,20 @@ Imports: backports, checkmate, data.table, mlr3misc, R6
 Suggests: lhs, testthat
 Encoding: UTF-8
 NeedsCompilation: no
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Collate: 'Condition.R' 'Design.R' 'NoDefault.R' 'Param.R' 'ParamDbl.R'
         'ParamFct.R' 'ParamInt.R' 'ParamLgl.R' 'ParamSet.R'
         'ParamSetCollection.R' 'ParamUty.R' 'Sampler.R' 'Sampler1D.R'
         'SamplerHierarchical.R' 'SamplerJointIndep.R' 'SamplerUnif.R'
         'asserts.R' 'generate_design_grid.R' 'generate_design_lhs.R'
-        'generate_design_random.R' 'reexports.R' 'zzz.R'
-Packaged: 2020-04-14 23:11:01 UTC; michel
+        'generate_design_random.R' 'helper.R' 'reexports.R' 'zzz.R'
+Packaged: 2020-07-06 19:29:05 UTC; michel
 Author: Michel Lang [cre, aut] (<https://orcid.org/0000-0001-9754-0393>),
   Bernd Bischl [aut] (<https://orcid.org/0000-0001-6002-6980>),
   Jakob Richter [aut] (<https://orcid.org/0000-0003-4481-5554>),
   Xudong Sun [aut] (<https://orcid.org/0000-0003-3269-2307>),
-  Martin Binder [aut]
+  Martin Binder [aut],
+  Marc Becker [ctb] (<https://orcid.org/0000-0002-8115-0400>)
 Maintainer: Michel Lang <michellang@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-04-15 09:20:07 UTC
+Date/Publication: 2020-07-07 09:40:02 UTC

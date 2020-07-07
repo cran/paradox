@@ -7,109 +7,10 @@
 #' The set also contains a member variable `values` which can be used to store an active configuration / or to partially fix
 #' some parameters to constant values (regarding subsequent sampling or generation of designs).
 #'
-#' @section Construction:
-#' ```
-#' ParamSet$new(params = named_list())
-#' ```
-#'
-#' * `params` :: named `list()`\cr
-#'   List of [Param], named with their respective ID.
-#'   Parameters are cloned.
-#'
-#' @section Fields:
-#' * `set_id` :: `character(1)` \cr
-#'   ID of this param set. Default `""`. Settable.
-#' * `length` :: `integer(1)` \cr
-#'   Number of contained [Param]s.
-#' * `is_empty` :: `logical(1)` \cr
-#'   Is the `ParamSet` empty?
-#' * `class` :: named `character()` \cr
-#'   Classes of contained parameters, named with parameter IDs.
-#' * `lower` :: named `double()` \cr
-#'   Lower bounds of parameters (`NA` if parameter is not numeric).
-#'   Named with parameter IDs.
-#' * `upper` :: named `double()` \cr
-#'   Upper bounds of parameters (`NA` if parameter is not numeric).
-#'   Named with parameter IDs.
-#' * `levels` :: named `list()` \cr
-#'   List of character vectors of allowed categorical values of contained parameters.
-#'   `NULL` if the parameter is not categorical.
-#'   Named with parameter IDs.
-#' * `nlevels` :: named `integer()` \cr
-#'   Number of categorical levels per parameter, `Inf` for double parameters or unbounded integer parameters.
-#'   Named with param IDs.
-#' * `is_bounded` :: named `logical(1)` \cr
-#'   Do all parameters have finite bounds?
-#'   Named with parameter IDs.
-#' * `special_vals` :: named `list()` of `list()` \cr
-#'   Special values for all parameters.
-#'   Named with parameter IDs.
-#' * `storage_type` :: `character()` \cr
-#'   Data types of parameters when stored in tables.
-#'   Named with parameter IDs.
-#' * `tags` :: named `list()` of `character()` \cr
-#'   Can be used to group and subset parameters.
-#'   Named with parameter IDs.
-#' * `default` :: named `list()` \cr
-#'   Default values of all parameters.
-#'   If no default exists, element is not present.
-#'   Named with parameter IDs.
-#' * is_number :: named `logical()` \cr
-#'   Position is TRUE for [ParamDbl] and [ParamInt].
-#'   Named with parameter IDs.
-#' * is_categ          :: named `logical` \cr
-#'   Position is TRUE for [ParamFct] and [ParamLgl].
-#'   Named with parameter IDs.
-#' * `has_deps` :: `logical(1)` \cr
-#'   Has the set parameter dependencies?
-#' * `deps` :: [data.table::data.table()] \cr
-#'   Table has cols `id` (`character(1)`) and `on` (`character(1)`) and `cond` ([Condition]).
-#'   Lists all (direct) dependency parents of a param, through parameter IDs.
-#'   Internally created by a call to `add_dep`.
-#'   Settable, if you want to remove dependencies or perform other changes.
-#' * `values`         :: named `list()` \cr
-#'   Currently set / fixed parameter values.
-#'   Settable, and feasibility of values will be checked when you set them.
-#'   You do not have to set values for all parameters, but only for a subset.
-#'   When you set values, all previously set values will be unset / removed.
-#' * `trafo` :: `function(x, param_set)`\cr
-#'   Transformation function. Settable.
-#'   User has to pass a `function(x, param_set)`, of the form \cr
-#'   (named `list()`, [ParamSet]) -> named `list()`.\cr
-#'   The function is responsible to transform a feasible configuration into another encoding, before potentially evaluating the configuration with the target algorithm.
-#'   For the output, not many things have to hold.
-#'   It needs to have unique names, and the target algorithm has to accept the configuration.
-#'   For convenience, the self-paramset is also passed in, if you need some info from it (e.g. tags).
-#'   Is NULL by default, and you can set it to NULL to switch the transformation off.
-#' * `has_trafo` :: `logical(1)` \cr
-#'   Has the set a `trafo` function?
-#'
-#' @section Public methods:
-#' * `ids(class = NULL, is_bounded = NULL, tags = NULL)` \cr
-#'   (`character`, `logical(1)`, `character()`) -> `character()` \cr
-#'   Retrieves IDs of contained parameters based on some filter criteria selections, `NULL` means no restriction.
-#' * `get_values(class = NULL, is_bounded = NULL, tags = NULL)` \cr
-#'   (`character()`, `logical(1)`, `character()`) -> named `list()` \cr
-#'   Retrieves parameter values based on some selections, `NULL` means no restriction and is
-#'   equivalent to `$values`.
-#' * `add(param_set)` \cr
-#'   ([Param] | [ParamSet]) -> `self` \cr
-#'   Adds a single param or another set to this set, all params are cloned.
-#' * `subset(ids)` \cr
-#'   `character()` -> `self` \cr
-#'   Changes the current set to the set of passed IDs.
-#' * `test(x)`, `check(x)`, `assert(x)` \cr
-#'   Three \pkg{checkmate}-like check-functions. Takes a named list.
-#'   A point x is feasible, if it configures a subset of params,
-#'   all individual param constraints are satisfied and all dependencies are satisfied.
-#'   Params for which dependencies are not satisfied should not be part of `x`.
-#' * `add_dep(id, on, cond)` \cr
-#'   (`character(1)`, `character(1)`, [Condition]) -> `self` \cr
-#'    Adds a dependency to this set, so that param `id` now depends on param `on`.
-#'
 #' @section S3 methods and type converters:
-#' * `as.data.table()` \cr
-#'   Compact representation as datatable. Col types are: \cr
+#' * `as.data.table()`\cr
+#'   [ParamSet] -> [data.table::data.table()]\cr
+#'   Compact representation as datatable. Col types are:\cr
 #'     - id: character
 #'     - lower, upper: double
 #'     - levels: list col, with NULL elements
@@ -137,6 +38,12 @@
 #' @export
 ParamSet = R6Class("ParamSet",
   public = list(
+    #' @description
+    #' Creates a new instance of this [R6][R6::R6Class] class.
+    #'
+    #' @param params (`list()`)\cr
+    #'   List of [Param], named with their respective ID.
+    #'   Parameters are cloned.
     initialize = function(params = named_list()) {
       assert_list(params, types = "Param")
       ids = map_chr(params, "id")
@@ -145,6 +52,10 @@ ParamSet = R6Class("ParamSet",
       self$set_id = ""
     },
 
+    #' @description
+    #' Adds a single param or another set to this set, all params are cloned.
+    #'
+    #' @param p ([Param] | [ParamSet]).
     add = function(p) {
 
       assert_multi_class(p, c("Param", "ParamSet"))
@@ -165,6 +76,15 @@ ParamSet = R6Class("ParamSet",
       invisible(self)
     },
 
+    #' @description
+    #' Retrieves IDs of contained parameters based on some filter criteria
+    #' selections, `NULL` means no restriction.
+    #' Only returns IDs of parameters that satisfy all conditions.
+    #'
+    #' @param class (`character()`).
+    #' @param is_bounded (`logical(1)`).
+    #' @param tags (`character()`).
+    #' @return `character()`.
     ids = function(class = NULL, is_bounded = NULL, tags = NULL) {
 
       ids = names(self$params)
@@ -192,11 +112,24 @@ ParamSet = R6Class("ParamSet",
       ids[ii]
     },
 
+    #' @description
+    #' Retrieves parameter values based on some selections, `NULL` means no
+    #' restriction and is equivalent to `$values`.
+    #' Only returns values of parameters that satisfy all conditions.
+    #'
+    #' @param class (`character()`).
+    #' @param is_bounded (`logical(1)`).
+    #' @param tags (`character()`).
+    #' @return Named `list()`.
     get_values = function(class = NULL, is_bounded = NULL, tags = NULL) {
       values = self$values
       values[intersect(names(values), self$ids(class = class, is_bounded = is_bounded, tags = tags))]
     },
 
+    #' @description
+    #' Changes the current set to the set of passed IDs.
+    #'
+    #' @param ids (`character()`).
     subset = function(ids) {
       param_ids = names(self$params)
       assert_subset(ids, param_ids)
@@ -213,6 +146,14 @@ ParamSet = R6Class("ParamSet",
       invisible(self)
     },
 
+    #' @description
+    #' \pkg{checkmate}-like check-function. Takes a named list.
+    #' A point x is feasible, if it configures a subset of params,
+    #' all individual param constraints are satisfied and all dependencies are satisfied.
+    #' Params for which dependencies are not satisfied should not be part of `x`.
+    #'
+    #' @param xs (named `list()`).
+    #' @return If successful `TRUE`, if not a string with the error message.
     check = function(xs) {
 
       ok = check_list(xs, names = "unique")
@@ -272,10 +213,73 @@ ParamSet = R6Class("ParamSet",
       return(TRUE) # we passed all checks
     },
 
+    #' @description
+    #' \pkg{checkmate}-like test-function. Takes a named list.
+    #' A point x is feasible, if it configures a subset of params,
+    #' all individual param constraints are satisfied and all dependencies are satisfied.
+    #' Params for which dependencies are not satisfied should not be part of `x`.
+    #'
+    #' @param xs (named `list()`).
+    #' @return If successful `TRUE`, if not `FALSE`.
     test = function(xs) makeTest(res = self$check(xs)),
 
+    #' @description
+    #' \pkg{checkmate}-like assert-function. Takes a named list.
+    #' A point x is feasible, if it configures a subset of params,
+    #' all individual param constraints are satisfied and all dependencies are satisfied.
+    #' Params for which dependencies are not satisfied should not be part of `x`.
+    #'
+    #' @param xs (named `list()`).
+    #' @param .var.name (`character(1)`)\cr
+    #'   Name of the checked object to print in error messages.\cr
+    #'   Defaults to the heuristic implemented in [vname][checkmate::vname].
+    #' @return If successful `xs` invisibly, if not an error message.
     assert = function(xs, .var.name = vname(xs)) makeAssertion(xs, self$check(xs), .var.name, NULL),
 
+    #' @description
+    #' \pkg{checkmate}-like check-function. Takes a [data.table::data.table]
+    #' where rows are points and columns are parameters. A point x is feasible,
+    #' if it configures a subset of params, all individual param constraints are
+    #' satisfied and all dependencies are satisfied. Params for which
+    #' dependencies are not satisfied should be set to `NA` in `xdt`.
+    #'
+    #' @param xdt ([data.table::data.table]).
+    #' @return If successful `TRUE`, if not a string with the error message.
+    check_dt = function(xdt) {
+      xss = transpose(xdt, trafo = FALSE)
+      for (xs in xss) {
+        ok = self$check(xs)
+        if (!isTRUE(ok)) {
+          return(ok)
+        }
+      }
+
+      return(TRUE)
+    },
+
+    #' @description
+    #' \pkg{checkmate}-like test-function (s. `$check_dt()`).
+    #'
+    #' @param xdt ([data.table::data.table]).
+    #' @return If successful `TRUE`, if not `FALSE`.
+    test_dt = function(xdt) makeTest(res = self$check_dt(xdt)),
+
+    #' @description
+    #' \pkg{checkmate}-like assert-function (s. `$check_dt()`).
+    #'
+    #' @param xdt ([data.table::data.table]).
+    #' @param .var.name (`character(1)`)\cr
+    #'   Name of the checked object to print in error messages.\cr
+    #'   Defaults to the heuristic implemented in [vname][checkmate::vname].
+    #' @return If successful `xs` invisibly, if not an error message.
+    assert_dt = function(xdt, .var.name = vname(xdt)) makeAssertion(xdt, self$check_dt(xdt), .var.name, NULL),
+
+    #' @description
+    #' Adds a dependency to this set, so that param `id` now depends on param `on`.
+    #'
+    #' @param id (`character(1)`).
+    #' @param on (`character(1)`).
+    #' @param cond ([Condition]).
     add_dep = function(id, on, cond) {
       ids = names(self$params)
       assert_choice(id, ids)
@@ -292,9 +296,26 @@ ParamSet = R6Class("ParamSet",
       invisible(self)
     },
 
+    #' @description
+    #' Helper for print outputs.
+    format = function() {
+      if (!nzchar(self$set_id)) {
+        sprintf("<%s>", class(self)[1L])
+      } else {
+        sprintf("<%s:%s>", class(self)[1L], self$set_id)
+      }
+    },
+
+    #' @description
+    #' Printer.
+    #'
+    #' @param ... (ignored).
+    #' @param hide_cols (`character()`)\cr
+    #'   Which fields should not be printed? Default is `"nlevels"`,
+    #'   `"is_bounded"`, `"special_vals"`, `"tags"`, and `"storage_type"`.
     # printer, prints the set as a datatable, with the option to hide some cols
     print = function(..., hide_cols = c("nlevels", "is_bounded", "special_vals", "tags", "storage_type")) {
-      catf("ParamSet: %s", self$set_id)
+      catf(format(self))
       if (self$is_empty) {
         catf("Empty.")
       } else {
@@ -316,6 +337,7 @@ ParamSet = R6Class("ParamSet",
   ),
 
   active = list(
+    #' @template field_params
     params = function(rhs) {
       if (!missing(rhs) && !identical(rhs, private$.params)) {
         stop("$params is read-only.")
@@ -323,6 +345,7 @@ ParamSet = R6Class("ParamSet",
       private$.params
     },
 
+    #' @template field_deps
     deps = function(v) {
       if (missing(v)) {
         private$.deps
@@ -331,6 +354,8 @@ ParamSet = R6Class("ParamSet",
       }
     },
 
+    #' @field set_id (`character(1)`)\cr
+    #' ID of this param set. Default `""`. Settable.
     set_id = function(v) {
       if (missing(v)) {
         private$.set_id
@@ -343,62 +368,112 @@ ParamSet = R6Class("ParamSet",
       }
     },
 
+    #' @field length (`integer(1)`)\cr
+    #' Number of contained [Param]s.
     length = function() {
       length(self$params)
     },
 
+    #' @field is_empty (`logical(1)`)\cr
+    #' Is the `ParamSet` empty?
     is_empty = function() {
       length(self$params) == 0L
     },
 
+    #' @field class (named `character()`)\cr
+    #' Classes of contained parameters, named with parameter IDs.
     class = function() {
       private$get_member_with_idnames("class", as.character)
     },
 
+    #' @field lower (named `double()`)\cr
+    #' Lower bounds of parameters (`NA` if parameter is not numeric).
+    #' Named with parameter IDs.
     lower = function() {
       private$get_member_with_idnames("lower", as.double)
     },
 
+    #' @field upper (named `double()`)\cr
+    #' Upper bounds of parameters (`NA` if parameter is not numeric).
+    #' Named with parameter IDs.
     upper = function() {
       private$get_member_with_idnames("upper", as.double)
     },
 
+    #' @field levels (named `list()`)\cr
+    #' List of character vectors of allowed categorical values of contained parameters.
+    #' `NULL` if the parameter is not categorical.
+    #' Named with parameter IDs.
     levels = function() {
       private$get_member_with_idnames("levels", as.list)
     },
 
+    #' @field nlevels (named `integer()`)\cr
+    #' Number of categorical levels per parameter, `Inf` for double parameters or unbounded integer parameters.
+    #' Named with param IDs.
     nlevels = function() {
       private$get_member_with_idnames("nlevels", as.double)
     },
 
+    #' @field is_bounded (named `logical()`)\cr
+    #' Do all parameters have finite bounds?
+    #' Named with parameter IDs.
     is_bounded = function() {
       all(map_lgl(self$params, "is_bounded"))
     },
 
+    #' @field special_vals (named `list()` of `list()`)\cr
+    #' Special values for all parameters.
+    #' Named with parameter IDs.
     special_vals = function() {
       private$get_member_with_idnames("special_vals", as.list)
     },
 
+    #' @field default (named `list()`)\cr
+    #' Default values of all parameters.
+    #' If no default exists, element is not present.
+    #' Named with parameter IDs.
     default = function() {
       discard(private$get_member_with_idnames("default", as.list), is_nodefault)
     },
 
+    #' @field tags (named `list()` of `character()`)\cr
+    #' Can be used to group and subset parameters.
+    #' Named with parameter IDs.
     tags = function() {
       private$get_member_with_idnames("tags", as.list)
     },
 
+    #' @field storage_type (`character()`)\cr
+    #' Data types of parameters when stored in tables.
+    #' Named with parameter IDs.
     storage_type = function() {
       private$get_member_with_idnames("storage_type", as.character)
     },
 
+    #' @field is_number (named `logical()`)\cr
+    #' Position is TRUE for [ParamDbl] and [ParamInt].
+    #' Named with parameter IDs.
     is_number = function() {
       private$get_member_with_idnames("is_number", as.logical)
     },
 
+    #' @field is_categ (named `logical()`)\cr
+    #' Position is TRUE for [ParamFct] and [ParamLgl].
+    #' Named with parameter IDs.
     is_categ = function() {
       private$get_member_with_idnames("is_categ", as.logical)
     },
 
+    #' @field trafo (`function(x, param_set)`)\cr
+    #' Transformation function. Settable.
+    #' User has to pass a `function(x, param_set)`, of the form\cr
+    #' (named `list()`, [ParamSet]) -> named `list()`.\cr
+    #' The function is responsible to transform a feasible configuration into another encoding, before potentially evaluating the configuration with the target algorithm.
+    #' For the output, not many things have to hold.
+    #' It needs to have unique names, and the target algorithm has to accept the configuration.
+    #' For convenience, the self-paramset is also passed in, if you need some info from it (e.g. tags).
+    #' Is NULL by default, and you can set it to NULL to switch the transformation off.
     trafo = function(f) {
       if (missing(f)) {
         private$.trafo
@@ -408,10 +483,13 @@ ParamSet = R6Class("ParamSet",
       }
     },
 
+    #' @field has_trafo (`logical(1)`)\cr
+    #' Has the set a `trafo` function?
     has_trafo = function() {
       !is.null(private$.trafo)
     },
 
+    #' @template field_values
     values = function(xs) {
       if (missing(xs)) {
         return(private$.values)
@@ -422,6 +500,8 @@ ParamSet = R6Class("ParamSet",
       private$.values = xs
     },
 
+    #' @field has_deps (`logical(1)`)\cr
+    #' Has the set parameter dependencies?
     has_deps = function() {
       nrow(private$.deps) > 0L
     }
@@ -444,13 +524,17 @@ ParamSet = R6Class("ParamSet",
           value$cond = lapply(value$cond, function(x) x$clone(deep = TRUE))
           value
         },
-        .values = map(value, function(x)
+        .values = map(value, function(x) {
           # clones R6 objects in values, leave other things as they are
-          if (is.environment(x) && !is.null(x$.__enclos_env__)) {
+
+          # safely get .__enclos_env, errors if packages overwrite `$` i.e. in reticulate.
+          # https://github.com/rstudio/reticulate/blob/master/R/python.R L 343
+          if (is.environment(x) && !is.null(tryCatch(x$.__enclos_env__, error = function(e) NULL))) {
             x$clone(deep = TRUE)
           } else {
             x
-          }),
+          }
+        }),
         value
       )
     }

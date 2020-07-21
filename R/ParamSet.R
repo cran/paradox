@@ -465,6 +465,18 @@ ParamSet = R6Class("ParamSet",
       private$get_member_with_idnames("is_categ", as.logical)
     },
 
+    #' @field is_numeric (`logical(1)`)\cr
+    #' Is `TRUE` if all parameters are [ParamDbl] or [ParamInt].
+    is_numeric = function() {
+      all(self$is_number)
+    },
+
+    #' @field is_categorical (`logical(1)`)\cr
+    #' Is `TRUE` if all parameters are [ParamFct] and [ParamLgl].
+    is_categorical = function() {
+      all(self$is_categ)
+    },
+
     #' @field trafo (`function(x, param_set)`)\cr
     #' Transformation function. Settable.
     #' User has to pass a `function(x, param_set)`, of the form\cr
@@ -544,4 +556,20 @@ ParamSet = R6Class("ParamSet",
 #' @export
 as.data.table.ParamSet = function(x, ...) {
   map_dtr(x$params, as.data.table)
+}
+
+#' @export
+rd_info.ParamSet = function(ps) {
+  params = as.data.table(ps)
+  if (nrow(params) == 0L)
+    return ("Empty ParamSet")
+  params$default = replace(params$default, map_lgl(params$default, inherits, "NoDefault"), list("-"))
+  params$levels = replace(params$levels, lengths(params$levels) == 0L, list("-"))
+  params$range = pmap_chr(params[, c("lower", "upper"), with = FALSE], rd_format_range)
+  params = params[, c("id", "storage_type", "default", "range", "levels")]
+  setnames(params, c("Id", "Type", "Default", "Range", "Levels"))
+  c(
+    "",
+    knitr::kable(params)
+  )
 }

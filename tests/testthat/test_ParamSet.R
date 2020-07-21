@@ -239,11 +239,15 @@ test_that("ParamSet$default", {
   expect_equal(ps$default, list(x = NULL))
 })
 
-test_that("is_number / is_categ", {
+test_that("is_number / is_categ / is_numeric / is_categoric", {
   expect_equal(th_paramset_full()$is_number,
     c(th_param_int = TRUE, th_param_dbl = TRUE, th_param_fct = FALSE, th_param_lgl = FALSE))
   expect_equal(th_paramset_full()$is_categ,
     c(th_param_int = FALSE, th_param_dbl = FALSE, th_param_fct = TRUE, th_param_lgl = TRUE))
+  expect_equal(th_paramset_numeric()$is_numeric, TRUE)
+  expect_equal(th_paramset_full()$is_numeric, FALSE)
+  expect_equal(th_paramset_categorical()$is_categorical, TRUE)
+  expect_equal(th_paramset_full()$is_categorical, FALSE)
 })
 
 test_that("ParamSet$ids", {
@@ -330,4 +334,11 @@ test_that("ParamSet$check_dt", {
   expect_character(ps$check_dt(xdt), fixed = "x_rep_1 = TRUE")
   xdt = data.table(x_rep_1 = c(TRUE, TRUE, FALSE), x_rep_2 = c(FALSE, TRUE, NA))
   expect_true(ps$check_dt(xdt))
+})
+
+test_that("rd_info.ParamSet", {
+  ps = ParamSet$new()
+  expect_character(rd_info(ps))
+  ps$add(ParamFct$new("a", levels = letters[1:3]))
+  expect_character(rd_info(ps))
 })

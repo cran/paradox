@@ -4,7 +4,8 @@
 #' A set of [Param] objects.
 #' Please note that when creating a set or adding to it, the parameters of the
 #' resulting set have to be uniquely named with IDs with valid R names.
-#' The set also contains a member variable `values` which can be used to store an active configuration / or to partially fix
+#' The set also contains a member variable `values` which can be used to store an active configuration /
+#' or to partially fix
 #' some parameters to constant values (regarding subsequent sampling or generation of designs).
 #'
 #' @section S3 methods and type converters:
@@ -38,6 +39,12 @@
 #' @export
 ParamSet = R6Class("ParamSet",
   public = list(
+
+    #' @field assert_values (`logical(1)`)\cr
+    #' Should values be checked for validity during assigment to active binding `$values`?
+    #' Default is `TRUE`, only switch this off if you know what you are doing.
+    assert_values = TRUE,
+
     #' @description
     #' Creates a new instance of this [R6][R6::R6Class] class.
     #'
@@ -86,8 +93,12 @@ ParamSet = R6Class("ParamSet",
     #' @param tags (`character()`).
     #' @return `character()`.
     ids = function(class = NULL, is_bounded = NULL, tags = NULL) {
+      assert_character(class, any.missing = FALSE, null.ok = TRUE)
+      assert_flag(is_bounded, null.ok = TRUE)
+      assert_character(tags, any.missing = FALSE, null.ok = TRUE)
 
-      ids = names(self$params)
+      params = self$params
+      ids = names(params)
       if (is.null(class) && is.null(is_bounded) && is.null(tags)) {
         return(ids)
       }
@@ -95,18 +106,15 @@ ParamSet = R6Class("ParamSet",
       ii = rep(TRUE, length(ids))
 
       if (!is.null(class)) {
-        assert_character(class, any.missing = FALSE)
-        ii = ii & self$class %in% class
+        ii = ii & map_chr(params, "class") %in% class
       }
 
       if (!is.null(is_bounded)) {
-        assert_flag(is_bounded)
-        ii = ii & map_lgl(self$params, "is_bounded")
+        ii = ii & map_lgl(params, "is_bounded")
       }
 
       if (!is.null(tags)) {
-        assert_character(tags, any.missing = FALSE)
-        ii = ii & map_lgl(self$tags, function(required, set) all(required %in% set), required = tags)
+        ii = ii & map_lgl(params, function(p) all(tags %in% p$tags))
       }
 
       ids[ii]
@@ -133,15 +141,18 @@ ParamSet = R6Class("ParamSet",
     subset = function(ids) {
       param_ids = names(self$params)
       assert_subset(ids, param_ids)
-      if (self$has_deps) { # check that all required / leftover parents are still in new ids
-        parents = unique(self$deps[id %in% ids, "on"][[1L]])
+      deps = self$deps
+      if (nrow(deps)) { # check that all required / leftover parents are still in new ids
+        parents = unique(deps[get("id") %in% ids, "on"][[1L]])
         pids_not_there = setdiff(parents, ids)
         if (length(pids_not_there) > 0L) {
-          stopf("Subsetting so that dependencies on params exist which would be gone: %s.\nIf you still want to do that, manipulate '$deps' yourself.", str_collapse(pids_not_there))
+          stopf(paste0("Subsetting so that dependencies on params exist which would be gone: %s.",
+              "\nIf you still want to do that, manipulate '$deps' yourself."), str_collapse(pids_not_there))
         }
       }
       private$.params = private$.params[ids]
-      ids2 = union(intersect(ids, names(private$.values)), setdiff(names(private$.values), param_ids)) # restrict to ids already in pvals
+      # restrict to ids already in pvals
+      ids2 = union(intersect(ids, names(private$.values)), setdiff(names(private$.values), param_ids))
       private$.values = private$.values[ids2]
       invisible(self)
     },
@@ -160,11 +171,12 @@ ParamSet = R6Class("ParamSet",
       if (!isTRUE(ok)) {
         return(ok)
       }
+      params = self$params
       ns = names(xs)
-      ids = names(self$params)
+      ids = names(params)
 
       # check that all 'required' params are there
-      required = setdiff(self$ids(tags = "required"), ns)
+      required = setdiff(names(keep(params, function(p) "required" %in% p$tags)), ns)
       if (length(required) > 0L) {
         return(sprintf("Missing required parameters: %s", str_collapse(required)))
       }
@@ -179,16 +191,16 @@ ParamSet = R6Class("ParamSet",
 
       # check each parameters feasibility
       for (n in ns) {
-        ch = self$params[[n]]$check(xs[[n]])
+        ch = params[[n]]$check(xs[[n]])
         if (test_string(ch)) { # we failed a check, return string
           return(paste0(n, ": ", ch))
         }
       }
 
       # check dependencies
-      if (self$has_deps) {
-        deps = self$deps
-        for (j in seq_row(self$deps)) {
+      deps = self$deps
+      if (nrow(deps)) {
+        for (j in seq_row(deps)) {
           p1id = deps$id[j]
           p2id = deps$on[j]
           # we are ONLY ok if:
@@ -198,10 +210,12 @@ ParamSet = R6Class("ParamSet",
           ok = (p1id %in% ns && p2id %in% ns && cond$test(xs[[p2id]])) ||
             (p1id %nin% ns)
           if (isFALSE(ok)) {
-            message = sprintf("The parameter '%s' can only be set if the following condition is met '%s'.", p1id, cond$as_string(p2id))
+            message = sprintf("The parameter '%s' can only be set if the following condition is met '%s'.",
+              p1id, cond$as_string(p2id))
             val = xs[[p2id]]
             if (is.null(val)) {
-              message = sprintf("%s Instead the parameter value for '%s' is not set at all. Try setting '%s' to a value that satisfies the condition", message, p2id, p2id)
+              message = sprintf(paste("%s Instead the parameter value for '%s' is not set at all.",
+                  "Try setting '%s' to a value that satisfies the condition"), message, p2id, p2id)
             } else {
               message = sprintf("%s Instead the current parameter value is: %s=%s", message, p2id, val)
             }
@@ -234,7 +248,7 @@ ParamSet = R6Class("ParamSet",
     #'   Name of the checked object to print in error messages.\cr
     #'   Defaults to the heuristic implemented in [vname][checkmate::vname].
     #' @return If successful `xs` invisibly, if not an error message.
-    assert = function(xs, .var.name = vname(xs)) makeAssertion(xs, self$check(xs), .var.name, NULL),
+    assert = function(xs, .var.name = vname(xs)) makeAssertion(xs, self$check(xs), .var.name, NULL), # nolint
 
     #' @description
     #' \pkg{checkmate}-like check-function. Takes a [data.table::data.table]
@@ -272,7 +286,7 @@ ParamSet = R6Class("ParamSet",
     #'   Name of the checked object to print in error messages.\cr
     #'   Defaults to the heuristic implemented in [vname][checkmate::vname].
     #' @return If successful `xs` invisibly, if not an error message.
-    assert_dt = function(xdt, .var.name = vname(xdt)) makeAssertion(xdt, self$check_dt(xdt), .var.name, NULL),
+    assert_dt = function(xdt, .var.name = vname(xdt)) makeAssertion(xdt, self$check_dt(xdt), .var.name, NULL), # nolint
 
     #' @description
     #' Adds a dependency to this set, so that param `id` now depends on param `on`.
@@ -281,14 +295,15 @@ ParamSet = R6Class("ParamSet",
     #' @param on (`character(1)`).
     #' @param cond ([Condition]).
     add_dep = function(id, on, cond) {
-      ids = names(self$params)
+      params = self$params
+      ids = names(params)
       assert_choice(id, ids)
       assert_choice(on, ids)
       assert_r6(cond, "Condition")
       if (id == on) {
         stopf("A param cannot depend on itself!")
       }
-      feasible_on_values = map_lgl(cond$rhs, self$params[[on]]$test)
+      feasible_on_values = map_lgl(cond$rhs, params[[on]]$test)
       if (any(!feasible_on_values)) {
         stopf("Condition has infeasible values for %s: %s", on, str_collapse(cond$rhs[!feasible_on_values]))
       }
@@ -299,10 +314,11 @@ ParamSet = R6Class("ParamSet",
     #' @description
     #' Helper for print outputs.
     format = function() {
-      if (!nzchar(self$set_id)) {
+      set_id = self$set_id
+      if (!nzchar(set_id)) {
         sprintf("<%s>", class(self)[1L])
       } else {
-        sprintf("<%s:%s>", class(self)[1L], self$set_id)
+        sprintf("<%s:%s>", class(self)[1L], set_id)
       }
     },
 
@@ -316,13 +332,14 @@ ParamSet = R6Class("ParamSet",
     # printer, prints the set as a datatable, with the option to hide some cols
     print = function(..., hide_cols = c("nlevels", "is_bounded", "special_vals", "tags", "storage_type")) {
       catf(format(self))
-      if (self$is_empty) {
+      d = as.data.table(self)
+      if (!nrow(d)) {
         catf("Empty.")
       } else {
-        d = as.data.table(self)
         assert_subset(hide_cols, names(d))
-        if (self$has_deps) { # add a nice extra charvec-col to the tab, which lists all parents-ids
-          dd = self$deps[, .(parents = list(unlist(on))), by = id]
+        deps = self$deps
+        if (nrow(deps)) { # add a nice extra charvec-col to the tab, which lists all parents-ids
+          dd = deps[, list(parents = list(unlist(get("on")))), by = "id"]
           d = merge(d, dd, on = "id", all.x = TRUE)
         }
         v = named_list(d$id) # add values to last col of print-dt as list col
@@ -481,7 +498,8 @@ ParamSet = R6Class("ParamSet",
     #' Transformation function. Settable.
     #' User has to pass a `function(x, param_set)`, of the form\cr
     #' (named `list()`, [ParamSet]) -> named `list()`.\cr
-    #' The function is responsible to transform a feasible configuration into another encoding, before potentially evaluating the configuration with the target algorithm.
+    #' The function is responsible to transform a feasible configuration into another encoding,
+    #' before potentially evaluating the configuration with the target algorithm.
     #' For the output, not many things have to hold.
     #' It needs to have unique names, and the target algorithm has to accept the configuration.
     #' For convenience, the self-paramset is also passed in, if you need some info from it (e.g. tags).
@@ -506,16 +524,27 @@ ParamSet = R6Class("ParamSet",
       if (missing(xs)) {
         return(private$.values)
       }
-
-      self$assert(xs)
-      if (length(xs) == 0L) xs = named_list()
+      if (self$assert_values)
+        self$assert(xs)
+      if (length(xs) == 0L) {
+        xs = named_list()
+      } else {
+        # convert all integer params really to storage type int
+        # this is not the greatest way to do this, evvery param should maybe have a ".convert"
+        # function, but this seems overkill for this single issue
+        # solves issue #293
+        int_ids = self$ids(class = "ParamInt")
+        int_ids = intersect(int_ids, names(xs))
+        if (length(int_ids) > 0L)
+          xs[int_ids] = as.list(as.integer(unlist(xs[int_ids])))
+      }
       private$.values = xs
     },
 
     #' @field has_deps (`logical(1)`)\cr
     #' Has the set parameter dependencies?
     has_deps = function() {
-      nrow(private$.deps) > 0L
+      nrow(self$deps) > 0L
     }
   ),
 
@@ -526,7 +555,10 @@ ParamSet = R6Class("ParamSet",
     .values = named_list(),
     .deps = data.table(id = character(0L), on = character(0L), cond = list()),
     # return a slot / AB, as a named vec, named with id (and can enforce a certain vec-type)
-    get_member_with_idnames = function(member, astype) set_names(astype(map(self$params, member)), names(self$params)),
+    get_member_with_idnames = function(member, astype) {
+      params = self$params
+      set_names(astype(map(params, member)), names(params))
+    },
 
     deep_clone = function(name, value) {
       switch(name,
@@ -554,17 +586,18 @@ ParamSet = R6Class("ParamSet",
 )
 
 #' @export
-as.data.table.ParamSet = function(x, ...) {
+as.data.table.ParamSet = function(x, ...) { # nolint
   map_dtr(x$params, as.data.table)
 }
 
 #' @export
-rd_info.ParamSet = function(ps) {
+rd_info.ParamSet = function(ps) { # nolint
   params = as.data.table(ps)
   if (nrow(params) == 0L)
-    return ("Empty ParamSet")
+    return("Empty ParamSet")
   params$default = replace(params$default, map_lgl(params$default, inherits, "NoDefault"), list("-"))
   params$levels = replace(params$levels, lengths(params$levels) == 0L, list("-"))
+  params$levels = map_chr(params$levels, str_collapse, n = 10L)
   params$range = pmap_chr(params[, c("lower", "upper"), with = FALSE], rd_format_range)
   params = params[, c("id", "storage_type", "default", "range", "levels")]
   setnames(params, c("Id", "Type", "Default", "Range", "Levels"))

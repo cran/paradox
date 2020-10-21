@@ -26,7 +26,17 @@ transpose = function(data, ps = NULL, filter_na = TRUE, trafo = TRUE) {
     xs = map(xs, function(x) Filter(Negate(is_scalar_na), x))
   }
   if (!is.null(ps) && trafo) {
-    if(ps$has_trafo) xs = map(xs, function(x) ps$trafo(x, ps))
+    if (ps$has_trafo) xs = map(xs, function(x) ps$trafo(x, ps))
   }
   return(xs)
+}
+
+as_type = function(x, type) {
+  switch(type,
+    logical = as.logical(x),
+    integer = as.integer(x),
+    numeric = as.numeric(x),
+    character = as.character(x),
+    stopf("Invalid storage type '%s'", type)
+  )
 }

@@ -1,7 +1,8 @@
 #' @title Sampler1D Class
 #'
 #' @description
-#' 1D sampler, abstract base class for Sampler like [Sampler1DUnif], [Sampler1DRfun], [Sampler1DCateg] and [Sampler1DNormal].
+#' 1D sampler, abstract base class for Sampler like [Sampler1DUnif], [Sampler1DRfun],
+#' [Sampler1DCateg] and [Sampler1DNormal].
 #'
 #' @template param_param
 #'
@@ -29,7 +30,7 @@ Sampler1D = R6Class("Sampler1D", inherit = Sampler, # abstract base class
   private = list(
     # create a 1-col-dt, named by param-id, from a data vector (from sampling), and enforce storage type
     as_dt_col = function(x) {
-      x = as(x, self$param$storage_type)
+      x = as_type(x, self$param$storage_type)
       set_names(data.table(x), self$param$id)
     }
   )
@@ -97,7 +98,8 @@ Sampler1DRfun = R6Class("Sampler1DRfun", inherit = Sampler1D,
   ),
 
   private = list(
-    # maybe we want an option to use my truncation here, as this slows stuff down somewhat and there are some real truncated rngs in R
+    # maybe we want an option to use my truncation here, as this slows stuff down somewhat
+    # and there are some real truncated rngs in R
     .sample = function(n) {
       if (self$trunc) {
         s = private$sample_truncated(n, self$rfun)

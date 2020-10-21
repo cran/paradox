@@ -1,7 +1,7 @@
 Type: Package
 Package: paradox
 Title: Define and Work with Parameter Spaces for Complex Algorithms
-Version: 0.4.0
+Version: 0.5.0
 Authors@R: 
     c(person(given = "Michel",
              family = "Lang",
@@ -39,7 +39,7 @@ Description: Define parameter spaces, constraints and
 License: LGPL-3
 URL: https://paradox.mlr-org.com, https://github.com/mlr-org/paradox
 BugReports: https://github.com/mlr-org/paradox/issues
-Imports: backports, checkmate, data.table, mlr3misc (>= 0.4.0), R6
+Imports: backports, checkmate, data.table, mlr3misc (>= 0.5.0), R6
 Suggests: knitr, lhs, testthat
 Encoding: UTF-8
 NeedsCompilation: no
@@ -50,7 +50,7 @@ Collate: 'Condition.R' 'Design.R' 'NoDefault.R' 'Param.R' 'ParamDbl.R'
         'SamplerHierarchical.R' 'SamplerJointIndep.R' 'SamplerUnif.R'
         'asserts.R' 'generate_design_grid.R' 'generate_design_lhs.R'
         'generate_design_random.R' 'helper.R' 'reexports.R' 'zzz.R'
-Packaged: 2020-07-21 18:17:26 UTC; michel
+Packaged: 2020-10-21 07:40:51 UTC; michel
 Author: Michel Lang [cre, aut] (<https://orcid.org/0000-0001-9754-0393>),
   Bernd Bischl [aut] (<https://orcid.org/0000-0001-6002-6980>),
   Jakob Richter [aut] (<https://orcid.org/0000-0003-4481-5554>),
@@ -59,4 +59,4 @@ Author: Michel Lang [cre, aut] (<https://orcid.org/0000-0001-9754-0393>),
   Marc Becker [ctb] (<https://orcid.org/0000-0002-8115-0400>)
 Maintainer: Michel Lang <michellang@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-07-21 19:10:02 UTC
+Date/Publication: 2020-10-21 20:30:02 UTC

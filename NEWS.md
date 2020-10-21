@@ -1,3 +1,9 @@
+# paradox 0.4.0-9000
+
+* Compact in-memory representation of R6 objects to save space when
+  saving objects via saveRDS(), serialize() etc.
+* Improved performance for `ParamSetCollection`.
+
 # paradox 0.4.0
 
 * New public methods `is_numeric()` and `is_categorical()` for parameter sets.

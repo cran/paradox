@@ -165,6 +165,7 @@ Has the set parameter dependencies?}
 \item \href{#method-ids}{\code{ParamSet$ids()}}
 \item \href{#method-get_values}{\code{ParamSet$get_values()}}
 \item \href{#method-subset}{\code{ParamSet$subset()}}
+\item \href{#method-search_space}{\code{ParamSet$search_space()}}
 \item \href{#method-check}{\code{ParamSet$check()}}
 \item \href{#method-test}{\code{ParamSet$test()}}
 \item \href{#method-assert}{\code{ParamSet$assert()}}
@@ -247,7 +248,12 @@ Retrieves parameter values based on some selections, \code{NULL} means no
 restriction and is equivalent to \verb{$values}.
 Only returns values of parameters that satisfy all conditions.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ParamSet$get_values(class = NULL, is_bounded = NULL, tags = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ParamSet$get_values(
+  class = NULL,
+  is_bounded = NULL,
+  tags = NULL,
+  type = "with_token"
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -258,6 +264,9 @@ Only returns values of parameters that satisfy all conditions.
 \item{\code{is_bounded}}{(\code{logical(1)}).}
 
 \item{\code{tags}}{(\code{character()}).}
+
+\item{\code{type}}{(\code{character(1)})\cr
+Return values \code{with_token}, \code{without_token} or \code{only_token}?}
 }
 \if{html}{\out{</div>}}
 }
@@ -278,6 +287,23 @@ Changes the current set to the set of passed IDs.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{ids}}{(\code{character()}).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-search_space"></a>}}
+\if{latex}{\out{\hypertarget{method-search_space}{}}}
+\subsection{Method \code{search_space()}}{
+Construct a \code{\link{ParamSet}} to tune over. Constructed from \code{\link{TuneToken}} in \verb{$values}, see \code{\link[=to_tune]{to_tune()}}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParamSet$search_space(values = self$values)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{values}}{(\verb{named list}): optional named list of \code{\link{TuneToken}} objects to convert, in place of \verb{$values}.}
 }
 \if{html}{\out{</div>}}
 }

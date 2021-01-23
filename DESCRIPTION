@@ -1,7 +1,7 @@
 Type: Package
 Package: paradox
 Title: Define and Work with Parameter Spaces for Complex Algorithms
-Version: 0.6.0
+Version: 0.7.0
 Authors@R: 
     c(person(given = "Michel",
              family = "Lang",
@@ -43,6 +43,8 @@ Imports: backports, checkmate, data.table, methods, mlr3misc (>=
         0.5.0), R6
 Suggests: knitr, lhs, testthat
 Encoding: UTF-8
+Config/testthat/edition: 3
+Config/testthat/parallel: false
 NeedsCompilation: no
 RoxygenNote: 7.1.1
 Collate: 'Condition.R' 'Design.R' 'NoDefault.R' 'Param.R' 'ParamDbl.R'
@@ -52,7 +54,7 @@ Collate: 'Condition.R' 'Design.R' 'NoDefault.R' 'Param.R' 'ParamDbl.R'
         'asserts.R' 'helper.R' 'domain.R' 'generate_design_grid.R'
         'generate_design_lhs.R' 'generate_design_random.R' 'ps.R'
         'reexports.R' 'to_tune.R' 'zzz.R'
-Packaged: 2020-12-03 23:00:37 UTC; michel
+Packaged: 2021-01-22 22:46:03 UTC; michel
 Author: Michel Lang [cre, aut] (<https://orcid.org/0000-0001-9754-0393>),
   Bernd Bischl [aut] (<https://orcid.org/0000-0001-6002-6980>),
   Jakob Richter [aut] (<https://orcid.org/0000-0003-4481-5554>),
@@ -61,4 +63,4 @@ Author: Michel Lang [cre, aut] (<https://orcid.org/0000-0001-9754-0393>),
   Marc Becker [ctb] (<https://orcid.org/0000-0002-8115-0400>)
 Maintainer: Michel Lang <michellang@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-12-04 06:20:08 UTC
+Date/Publication: 2021-01-23 06:10:03 UTC

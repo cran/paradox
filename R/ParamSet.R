@@ -130,15 +130,28 @@ ParamSet = R6Class("ParamSet",
     #' @param tags (`character()`).
     #' @param type (`character(1)`)\cr
     #' Return values `with_token`, `without_token` or `only_token`?
+    #' @param check_required (`logical(1)`)\cr
+    #' Check if all required parameters are set?
     #' @return Named `list()`.
-    get_values = function(class = NULL, is_bounded = NULL, tags = NULL, type = "with_token") {
+    get_values = function(class = NULL, is_bounded = NULL, tags = NULL,
+      type = "with_token", check_required = TRUE) {
       assert_choice(type, c("with_token", "without_token", "only_token"))
+      assert_flag(check_required)
       values = self$values
+      params = self$params
+      ns = names(values)
 
       if (type == "without_token") {
         values = discard(values, is, "TuneToken")
       } else if (type == "only_token") {
         values = keep(values, is, "TuneToken")
+      }
+
+      if(check_required) {
+        required = setdiff(names(keep(params, function(p) "required" %in% p$tags)), ns)
+        if (length(required) > 0L) {
+          stop(sprintf("Missing required parameters: %s", str_collapse(required)))
+        }
       }
 
       values[intersect(names(values), self$ids(class = class, is_bounded = is_bounded, tags = tags))]
@@ -200,15 +213,6 @@ ParamSet = R6Class("ParamSet",
       params = self$params
       ns = names(xs)
       ids = names(params)
-
-      # check that all 'required' params are there
-      required = setdiff(names(keep(params, function(p) "required" %in% p$tags)), ns)
-      if (length(required) > 0L) {
-        return(sprintf("Missing required parameters: %s", str_collapse(required)))
-      }
-      if (length(xs) == 0) {
-        return(TRUE)
-      } # a empty list is always feasible, if all req params are there
 
       extra = wf(ns %nin% ids)
       if (length(extra)) {
@@ -287,10 +291,10 @@ ParamSet = R6Class("ParamSet",
     #' satisfied and all dependencies are satisfied. Params for which
     #' dependencies are not satisfied should be set to `NA` in `xdt`.
     #'
-    #' @param xdt ([data.table::data.table]).
+    #' @param xdt ([data.table::data.table] | `data.frame()`).
     #' @return If successful `TRUE`, if not a string with the error message.
     check_dt = function(xdt) {
-      xss = transpose(xdt, trafo = FALSE)
+      xss = map(transpose_list(xdt), discard, is.na)
       for (xs in xss) {
         ok = self$check(xs)
         if (!isTRUE(ok)) {
@@ -512,15 +516,15 @@ ParamSet = R6Class("ParamSet",
       private$get_member_with_idnames("is_categ", as.logical)
     },
 
-    #' @field is_numeric (`logical(1)`)\cr
+    #' @field all_numeric (`logical(1)`)\cr
     #' Is `TRUE` if all parameters are [ParamDbl] or [ParamInt].
-    is_numeric = function() {
+    all_numeric = function() {
       all(self$is_number)
     },
 
-    #' @field is_categorical (`logical(1)`)\cr
+    #' @field all_categorical (`logical(1)`)\cr
     #' Is `TRUE` if all parameters are [ParamFct] and [ParamLgl].
-    is_categorical = function() {
+    all_categorical = function() {
       all(self$is_categ)
     },
 
@@ -560,15 +564,17 @@ ParamSet = R6Class("ParamSet",
       }
       if (length(xs) == 0L) {
         xs = named_list()
-      } else {
-        # convert all integer params really to storage type int
-        # this is not the greatest way to do this, evvery param should maybe have a ".convert"
-        # function, but this seems overkill for this single issue
-        # solves issue #293
-        # (Need to skip over ParamInt that have TuneToken value)
-        int_ids = intersect(self$ids(class = "ParamInt"), names(discard(xs, inherits, "TuneToken")))
-        if (length(int_ids) > 0L)
-          xs[int_ids] = as.list(as.integer(unlist(xs[int_ids])))
+      } else if (self$assert_values) {  # this only makes sense when we have asserts on
+        # convert all integer params really to storage type int, move doubles to within bounds etc.
+        # solves issue #293, #317
+        params = self$params  # cache the AB
+        for (n in names(xs)) {
+          p = params[[n]]
+          x = xs[[n]]
+          if (inherits(x, "TuneToken")) next
+          if (has_element(p$special_vals, x)) next
+          xs[[n]] = p$convert(x)
+        }
       }
       private$.values = xs
     },

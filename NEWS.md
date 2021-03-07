@@ -1,3 +1,12 @@
+# paradox 0.7.1
+
+* `Sampler1D` also accept `ParamSet`s with one `Param` now (#335).
+* Fixed sampling zero rows in `Sampler1DRfun` (#338).
+* `to_tune()`, `p_dbl()`, and `p_int()` accept `logscale` argument for tuning on
+  a logarithmic scale.
+* `to_tune` can be called with only `lower` or only `upper` now and will infer
+  the other bound if possible.
+
 # paradox 0.7.0
 
 * `ParamSet$get_values()` checks whether all required parameter values are set.

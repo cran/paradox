@@ -162,6 +162,31 @@ ParamSet = R6Class("ParamSet",
 
       values[intersect(names(values), self$ids(class = class, is_bounded = is_bounded, tags = tags))]
     },
+    #' @description
+    #' Allows to to modify (and overwrite) or replace the parameter values.
+    #' Per default already set values are being kept unless new values are being provided.
+    #'
+    #' @param ... (any)\cr
+    #'   Named parameter values.
+    #' @param .values (named `list()`)\cr
+    #'   Named list with parameter values. Names must not already appear in `...`.
+    #' @param .insert (`logical(1)`)\cr
+    #'   Whether to insert the values (old values are being kept, if not overwritten), or to
+    #'   replace all values. Default is TRUE.
+    #'
+    set_values = function(..., .values = list(), .insert = TRUE) {
+      dots = list(...)
+      assert_list(dots, names = "unique")
+      assert_list(.values, names = "unique")
+      assert_disjunct(names(dots), names(.values))
+      new_values = insert_named(dots, .values)
+      if (.insert) {
+        self$values = insert_named(self$values, new_values)
+      } else {
+        self$values = new_values
+      }
+      return(self)
+    },
 
     #' @description
     #' Changes the current set to the set of passed IDs.
@@ -557,7 +582,9 @@ ParamSet = R6Class("ParamSet",
       } else {
         assert_function(f, args = c("x", "param_set"), null.ok = TRUE)
         private$.trafo = f
-        private$.has_extra_trafo = TRUE
+        # is `TRUE` when function is passed to $trafo or .extra_trafo is set in ps()
+        # reset when trafo is set to NULL
+        private$.has_extra_trafo = !is.null(f)
       }
     },
 
@@ -709,6 +736,7 @@ rd_info.ParamSet = function(ps, descriptions = character(), ...) { # nolint
     set(params, j = "levels", value = map_chr(params$levels, str_collapse, n = 10L))
   }
   setnames(params, "storage_type", "type")
-  c("", knitr::kable(params, col.names = capitalize(names(params))))
+  x = c("", knitr::kable(params, col.names = capitalize(names(params))))
+  paste(x, collapse = "\n")
 }
 

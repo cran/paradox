@@ -1,3 +1,9 @@
+# paradox 0.10.0
+
+* Reset `.has_extra_trafo` to `FALSE` when trafo is set to `NULL`.
+* `rd_info.ParamSet` collapses vector with `"\n"` due changes in roxygen 7.2.0
+* Add method `set_values()` to conveniently add parameter values.
+
 # paradox 0.9.0
 
 * Added `default_values()` function to extract default values from `ParamSet`

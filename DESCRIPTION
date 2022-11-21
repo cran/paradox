@@ -1,7 +1,7 @@
 Type: Package
 Package: paradox
 Title: Define and Work with Parameter Spaces for Complex Algorithms
-Version: 0.10.0
+Version: 0.11.0
 Authors@R: 
     c(person(given = "Michel",
              family = "Lang",
@@ -41,7 +41,7 @@ URL: https://paradox.mlr-org.com, https://github.com/mlr-org/paradox
 BugReports: https://github.com/mlr-org/paradox/issues
 Imports: backports, checkmate, data.table, methods, mlr3misc (>=
         0.9.4), R6
-Suggests: knitr, lhs, testthat
+Suggests: knitr, lhs, spacefillr, testthat
 Encoding: UTF-8
 Config/testthat/edition: 3
 Config/testthat/parallel: false
@@ -53,9 +53,9 @@ Collate: 'Condition.R' 'Design.R' 'NoDefault.R' 'Param.R' 'ParamDbl.R'
         'SamplerHierarchical.R' 'SamplerJointIndep.R' 'SamplerUnif.R'
         'asserts.R' 'default_values.R' 'helper.R' 'domain.R'
         'generate_design_grid.R' 'generate_design_lhs.R'
-        'generate_design_random.R' 'ps.R' 'reexports.R' 'to_tune.R'
-        'zzz.R'
-Packaged: 2022-08-05 11:34:13 UTC; michel
+        'generate_design_random.R' 'generate_design_sobol.R' 'ps.R'
+        'reexports.R' 'to_tune.R' 'zzz.R'
+Packaged: 2022-11-21 08:50:22 UTC; michel
 Author: Michel Lang [cre, aut] (<https://orcid.org/0000-0001-9754-0393>),
   Bernd Bischl [aut] (<https://orcid.org/0000-0001-6002-6980>),
   Jakob Richter [aut] (<https://orcid.org/0000-0003-4481-5554>),
@@ -64,4 +64,4 @@ Author: Michel Lang [cre, aut] (<https://orcid.org/0000-0001-9754-0393>),
   Marc Becker [ctb] (<https://orcid.org/0000-0002-8115-0400>)
 Maintainer: Michel Lang <michellang@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-08-05 12:00:02 UTC
+Date/Publication: 2022-11-21 09:20:02 UTC

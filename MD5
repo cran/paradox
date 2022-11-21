@@ -1,6 +1,6 @@
-a3ae6febbd34536dd491253a3c74a822 *DESCRIPTION
-fd898fdfc4cadc709247a39e58068b37 *NAMESPACE
-7a4b2a138eb0951fb26eda65326e73c8 *NEWS.md
+bf1b69654d6bce79b7a6d34cd58ef7e1 *DESCRIPTION
+6b21817da38ae82575dfda405254cc06 *NAMESPACE
+5d2a32ee56e84da4a62c72e6334a276f *NEWS.md
 a917fcf59b05dbfccb069ea4877b5039 *R/Condition.R
 277feac58dee9b4a5b4cd916bce6c254 *R/Design.R
 c23a43d192bfbf7b6c24081cacc95cc6 *R/NoDefault.R
@@ -9,7 +9,7 @@ be2acd62254faee7874f27715d7216b6 *R/ParamDbl.R
 143f3300328fcb7451999356fccafc6c *R/ParamFct.R
 6b03a506bcd7282d5496c140c2a7040c *R/ParamInt.R
 192418bfb29df2dcefd3ffd4e2dee948 *R/ParamLgl.R
-15aeb77f963b3be2d9f55051e506e9b3 *R/ParamSet.R
+4ad3bcfd87b685d8e40095a67d702a20 *R/ParamSet.R
 7717fcb7badff24c65936b4ffb20d6c2 *R/ParamSetCollection.R
 00c29dd35c3c767fe46e54c07a1f4043 *R/ParamUty.R
 ea38b1905e336605e037d0d743b627f9 *R/Sampler.R
@@ -23,12 +23,13 @@ ca6e26194bc41b69823cd83ca55b3eb0 *R/domain.R
 342fa541e673b9a71279be14ad3f6a8d *R/generate_design_grid.R
 fa514721921b659ae261dbfb44882fa2 *R/generate_design_lhs.R
 0c802569ef12c02f1e70f63f35b971cc *R/generate_design_random.R
+258f19180bae414bdafb03b32fa954fa *R/generate_design_sobol.R
 252c1479c5200d736439666381d220d0 *R/helper.R
 9b573f85c77968941c49cc5c9aad3ff9 *R/ps.R
 02ee7c0f261c662c03e2d5dd039d94d2 *R/reexports.R
 d9414f7b31fa5f6d2ef1102e3a83a240 *R/to_tune.R
 85c4c6a8c1afd2d168e3bca592bbe7c2 *R/zzz.R
-b394ac9893fd055c758b7f10f27ef6df *README.md
+e8424704c557aa1651b0a0a16273120a *README.md
 beb14fe301b77a292de5815759db08df *man/Condition.Rd
 df5c02e530e47c436bb5ddfe4624b15f *man/Design.Rd
 848e56d3433909eb70f046c1f35696e5 *man/Domain.Rd
@@ -52,9 +53,10 @@ dacf7f5016b861957a90b6bbe7562a8c *man/SamplerJointIndep.Rd
 421e984cb8c671afd20192228cfc834e *man/SamplerUnif.Rd
 4d5ec3f7390309f9595cd1a0992a50c9 *man/assert_param.Rd
 0ba62903b26e3d376d53400b78453f96 *man/default_values.Rd
-abf7fabf9d90dcc7c33f04339e51796a *man/generate_design_grid.Rd
-5e3c371903480d19cd6d2ae527a9186a *man/generate_design_lhs.Rd
-9d96d04edfa89a7f0f93f7d332ddea62 *man/generate_design_random.Rd
+02f0eb73629b4869dbc0648813dd561e *man/generate_design_grid.Rd
+948eb46b63784a137b21fe153fe0e43a *man/generate_design_lhs.Rd
+846c14e4810072d524514403ce2def9f *man/generate_design_random.Rd
+68406ead31b67ed50173744bccbc397b *man/generate_design_sobol.Rd
 909102d1bffdb9aa2926f9c618245592 *man/paradox-package.Rd
 9c8fa54c62b1b9ef495538b0d935895a *man/ps.Rd
 f335065775c8e3da5418e544e3d92d5e *man/reexports.Rd
@@ -80,7 +82,7 @@ d9208c3e09b378db18644d4c9857e055 *tests/testthat/test_ParamInt.R
 3a29a4f61baf5fcdf1afb699c1401d99 *tests/testthat/test_default_values.R
 f1f6a1207589d930c22d597726a09e24 *tests/testthat/test_deps.R
 1092ebcb0dbb31bcd4e3d785fe12fec8 *tests/testthat/test_domain.R
-733495c0b4b6b5fa6dd444497fe63806 *tests/testthat/test_generate_design.R
+7bcd4a99d715dd5eb92013f6dc807d70 *tests/testthat/test_generate_design.R
 73b3cd1e2d3cc112abd8514b3f5f7512 *tests/testthat/test_param_vals.R
 6af4990596dad2434861acd47b3952dc *tests/testthat/test_sampler.R
 acac68e69fc37701bc8380ac9520b257 *tests/testthat/test_to_tune.R

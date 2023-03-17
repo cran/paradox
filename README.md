@@ -173,5 +173,4 @@ xst
 #> [1] 0.3688455
 ```
 
-Further documentation can be found in the
-[mlr3book](https://mlr3book.mlr-org.com/pipelines.html).
+Further documentation can be found in the [mlr3book](https://mlr3book.mlr-org.com/technical.html#paradox).

@@ -4,18 +4,18 @@
 \alias{Sampler1DCateg}
 \title{Sampler1DCateg Class}
 \description{
-Sampling from a discrete distribution, for a \link{ParamFct} or \link{ParamLgl}.
+Sampling from a discrete distribution, for a \code{\link{ParamSet}} containing a single \code{\link[=p_fct]{p_fct()}} or \code{\link[=p_lgl]{p_lgl()}}.
 }
 \seealso{
 Other Sampler: 
+\code{\link{Sampler}},
+\code{\link{Sampler1D}},
 \code{\link{Sampler1DNormal}},
 \code{\link{Sampler1DRfun}},
 \code{\link{Sampler1DUnif}},
-\code{\link{Sampler1D}},
 \code{\link{SamplerHierarchical}},
 \code{\link{SamplerJointIndep}},
-\code{\link{SamplerUnif}},
-\code{\link{Sampler}}
+\code{\link{SamplerUnif}}
 }
 \concept{Sampler}
 \section{Super classes}{
@@ -57,8 +57,9 @@ Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{param}}{(\link{Param})\cr
-Domain / support of the distribution we want to sample from.}
+\item{\code{param}}{(\code{\link{ParamSet}})\cr
+Domain / support of the distribution we want to sample from.
+Must be one-dimensional.}
 
 \item{\code{prob}}{(\code{numeric()} | NULL)\cr
 Numeric vector of \code{param$nlevels} probabilities, which is uniform by default.}

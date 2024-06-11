@@ -4,18 +4,18 @@
 \alias{Sampler1DNormal}
 \title{Sampler1DNormal Class}
 \description{
-Normal sampling (potentially truncated) for \link{ParamDbl}.
+Normal sampling (potentially truncated) for \code{\link[=p_dbl]{p_dbl()}}.
 }
 \seealso{
 Other Sampler: 
+\code{\link{Sampler}},
+\code{\link{Sampler1D}},
 \code{\link{Sampler1DCateg}},
 \code{\link{Sampler1DRfun}},
 \code{\link{Sampler1DUnif}},
-\code{\link{Sampler1D}},
 \code{\link{SamplerHierarchical}},
 \code{\link{SamplerJointIndep}},
-\code{\link{SamplerUnif}},
-\code{\link{Sampler}}
+\code{\link{SamplerUnif}}
 }
 \concept{Sampler}
 \section{Super classes}{
@@ -60,8 +60,9 @@ Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{param}}{(\link{Param})\cr
-Domain / support of the distribution we want to sample from.}
+\item{\code{param}}{(\code{\link{ParamSet}})\cr
+Domain / support of the distribution we want to sample from.
+Must be one-dimensional.}
 
 \item{\code{mean}}{(\code{numeric(1)})\cr
 Mean parameter of the normal distribution.

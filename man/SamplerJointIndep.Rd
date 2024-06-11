@@ -8,14 +8,14 @@ Create joint, independent sampler out of multiple other samplers.
 }
 \seealso{
 Other Sampler: 
+\code{\link{Sampler}},
+\code{\link{Sampler1D}},
 \code{\link{Sampler1DCateg}},
 \code{\link{Sampler1DNormal}},
 \code{\link{Sampler1DRfun}},
 \code{\link{Sampler1DUnif}},
-\code{\link{Sampler1D}},
 \code{\link{SamplerHierarchical}},
-\code{\link{SamplerUnif}},
-\code{\link{Sampler}}
+\code{\link{SamplerUnif}}
 }
 \concept{Sampler}
 \section{Super class}{
@@ -25,7 +25,7 @@ Other Sampler:
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{samplers}}{(\code{list()})\cr
-List of \link{Sampler} objects.}
+List of \code{\link{Sampler}} objects.}
 }
 \if{html}{\out{</div>}}
 }
@@ -58,7 +58,7 @@ Creates a new instance of this \link[R6:R6Class]{R6} class.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{samplers}}{(\code{list()})\cr
-List of \link{Sampler} objects.}
+List of \code{\link{Sampler}} objects.}
 }
 \if{html}{\out{</div>}}
 }

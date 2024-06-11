@@ -5,19 +5,19 @@
 \title{SamplerUnif Class}
 \description{
 Uniform random sampling for an arbitrary (bounded) \link{ParamSet}.
-Constructs 1 uniform sampler per \link{Param}, then passes them to \link{SamplerHierarchical}.
+Constructs 1 uniform sampler per parameter, then passes them to \link{SamplerHierarchical}.
 Hence, also works for \link{ParamSet}s sets with dependencies.
 }
 \seealso{
 Other Sampler: 
+\code{\link{Sampler}},
+\code{\link{Sampler1D}},
 \code{\link{Sampler1DCateg}},
 \code{\link{Sampler1DNormal}},
 \code{\link{Sampler1DRfun}},
 \code{\link{Sampler1DUnif}},
-\code{\link{Sampler1D}},
 \code{\link{SamplerHierarchical}},
-\code{\link{SamplerJointIndep}},
-\code{\link{Sampler}}
+\code{\link{SamplerJointIndep}}
 }
 \concept{Sampler}
 \section{Super classes}{
@@ -51,9 +51,8 @@ Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{param_set}}{(\link{ParamSet})\cr
-Domain / support of the distribution we want to sample from.
-ParamSet is cloned on construction.}
+\item{\code{param_set}}{(\code{\link{ParamSet}})\cr
+The \code{\link{ParamSet}} to associated with this \code{SamplerUnif}.}
 }
 \if{html}{\out{</div>}}
 }

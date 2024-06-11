@@ -8,14 +8,14 @@ Uniform random sampler for arbitrary (bounded) parameters.
 }
 \seealso{
 Other Sampler: 
+\code{\link{Sampler}},
+\code{\link{Sampler1D}},
 \code{\link{Sampler1DCateg}},
 \code{\link{Sampler1DNormal}},
 \code{\link{Sampler1DRfun}},
-\code{\link{Sampler1D}},
 \code{\link{SamplerHierarchical}},
 \code{\link{SamplerJointIndep}},
-\code{\link{SamplerUnif}},
-\code{\link{Sampler}}
+\code{\link{SamplerUnif}}
 }
 \concept{Sampler}
 \section{Super classes}{
@@ -49,8 +49,9 @@ Creates a new instance of this \link[R6:R6Class]{R6} class.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{param}}{(\link{Param})\cr
-Domain / support of the distribution we want to sample from.}
+\item{\code{param}}{(\code{\link{ParamSet}})\cr
+Domain / support of the distribution we want to sample from.
+Must be one-dimensional.}
 }
 \if{html}{\out{</div>}}
 }

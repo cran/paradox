@@ -1,7 +1,7 @@
 Type: Package
 Package: paradox
 Title: Define and Work with Parameter Spaces for Complex Algorithms
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     c(person(given = "Michel",
              family = "Lang",
@@ -47,7 +47,7 @@ Encoding: UTF-8
 Config/testthat/edition: 3
 Config/testthat/parallel: false
 NeedsCompilation: no
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Collate: 'Condition.R' 'Design.R' 'Domain.R' 'Domain_methods.R'
         'NoDefault.R' 'ParamDbl.R' 'ParamFct.R' 'ParamInt.R'
@@ -58,7 +58,7 @@ Collate: 'Condition.R' 'Design.R' 'Domain.R' 'Domain_methods.R'
         'generate_design_lhs.R' 'generate_design_random.R'
         'generate_design_sobol.R' 'helper.R' 'ps.R' 'ps_replicate.R'
         'ps_union.R' 'reexports.R' 'to_tune.R' 'zzz.R'
-Packaged: 2024-06-10 19:04:01 UTC; user
+Packaged: 2024-07-09 11:25:23 UTC; user
 Author: Michel Lang [aut] (<https://orcid.org/0000-0001-9754-0393>),
   Bernd Bischl [aut] (<https://orcid.org/0000-0001-6002-6980>),
   Jakob Richter [aut] (<https://orcid.org/0000-0003-4481-5554>),
@@ -67,4 +67,4 @@ Author: Michel Lang [aut] (<https://orcid.org/0000-0001-9754-0393>),
   Marc Becker [ctb] (<https://orcid.org/0000-0002-8115-0400>)
 Maintainer: Martin Binder <mlr.developer@mb706.com>
 Repository: CRAN
-Date/Publication: 2024-06-11 12:30:02 UTC
+Date/Publication: 2024-07-09 13:10:02 UTC
